@@ -13,12 +13,26 @@ public class Main {
         JSONObject json = new JSONObject();
 
         try {
-            json = JsonHelper.readJsonFromUrl("https://opentdb.com/api.php?amount=10");
+            System.out.println("Welcome to the quiz show!\nTry and answer 10 questions!\n" +
+                    "Pick a category or leave blank for random:");
+            String category = read.nextLine();
+
+
+            json = JsonHelper.readJsonFromUrl("https://opentdb.com/api_category.php");
+            String id = "";
+
+            for (Object field : json.getJSONArray("trivia_categories").toList()) {
+                if (((HashMap)field).get("name").equals(category)) {
+                    id = String.valueOf(((HashMap)field).get("id"));
+                    break;
+                }
+            }
+
+            json = JsonHelper.readJsonFromUrl("https://opentdb.com/api.php?amount=10&category=" + id);
             //System.out.println(json.getJSONArray("results"));
 
             Iterator<Object> questions = (json.getJSONArray("results")).iterator();
 
-            System.out.println("Welcome to the quiz show!\nTry and answer 10 questions!");
             int score = 0;
             while (questions.hasNext()) {
                 JSONObject question = (JSONObject) questions.next();
@@ -49,7 +63,7 @@ public class Main {
 
             System.out.println("Finish!\nYour final score is " + score + "/10!" );
         } catch (Exception e) {
-            System.out.println("Error");
+            System.out.println("Error\n" + e);
         }
     }
 }
